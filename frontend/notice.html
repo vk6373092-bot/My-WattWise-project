@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Watt-Wise | Notices & Updates</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  min-height:100vh;
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:
+    linear-gradient(rgba(0,0,0,.75), rgba(0,0,0,.75)),
+    url("solar.jpg") no-repeat center/cover;
+  color:#f9fafb;
+}
+
+header{
+  background:#0b0f14;
+  padding:14px 50px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-size:26px;
+  font-weight:800;
+  color:#4ade80;
+}
+
+a{color:#4ade80;text-decoration:none}
+
+.container{
+  max-width:900px;
+  margin:40px auto;
+  background:rgba(0,0,0,.6);
+  padding:30px;
+  border-radius:14px;
+}
+
+.notice{
+  background:rgba(20,20,20,.9);
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:20px;
+  cursor:pointer;
+}
+
+.notice h3{color:#4ade80;margin:0}
+.notice small{opacity:.7}
+
+.notice-details{
+  display:none;
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid #333;
+}
+
+.notice-details a{
+  display:inline-block;
+  margin-top:8px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">⚡ Watt-Wise</div>
+  <a href="buyer.html">← Back to Home</a>
+</header>
+
+<div class="container">
+  <h2>📢 Notices & Updates</h2>
+  <div id="noticeList"></div>
+</div>
+
+<script>
+async function loadNotices() {
+  const res = await fetch("http://localhost:5000/api/user/notices");
+  const notices = await res.json();
+
+  const box = document.getElementById("noticeList");
+  box.innerHTML = "";
+
+  if (!notices.length) {
+    box.innerHTML = "<p>No notices available.</p>";
+    return;
+  }
+
+  notices.forEach(n => {
+    const div = document.createElement("div");
+    div.className = "notice";
+    div.innerHTML = `
+      <h3>${n.title}</h3>
+      <small>${new Date(n.createdAt).toLocaleString()}</small>
+
+      <div class="notice-details">
+        <p>${n.message}</p>
+        ${n.pdf ? `<a href="http://localhost:5000/uploads/${n.pdf}" target="_blank">📄 Download PDF</a>` : ""}
+      </div>
+    `;
+
+    div.onclick = () => {
+      const details = div.querySelector(".notice-details");
+      details.style.display = details.style.display === "block" ? "none" : "block";
+    };
+
+    box.appendChild(div);
+  });
+}
+
+loadNotices();
+</script>
+
+</body>
+</html>

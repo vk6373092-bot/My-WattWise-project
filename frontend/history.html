@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Purchase History | WattWise</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background:
+        linear-gradient(rgba(0,0,0,.75), rgba(0,0,0,.75)),
+        url("solar.jpg") center/cover fixed;
+      color: #e5e7eb;
+      padding: 30px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      color: #34d399;
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .back-btn {
+      text-decoration: none;
+      color: #4ade80;
+      font-weight: 600;
+      border: 1px solid #4ade80;
+      padding: 8px 14px;
+      border-radius: 8px;
+      transition: .2s;
+    }
+
+    .back-btn:hover {
+      background: #4ade80;
+      color: #000;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 22px;
+    }
+
+    .card {
+      background: rgba(15,15,15,.85);
+      border-radius: 16px;
+      padding: 18px 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.35);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 30px rgba(0,0,0,.55);
+    }
+
+    .time {
+      font-size: 14px;
+      opacity: .9;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .row {
+      font-size: 15px;
+      margin: 4px 0;
+    }
+
+    .row b {
+      color: #a7f3d0;
+      font-weight: 600;
+    }
+
+    .total {
+      margin-top: 8px;
+      font-size: 16px;
+      color: #4ade80;
+      font-weight: 700;
+    }
+
+    .empty {
+      opacity: .8;
+      font-size: 18px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🧾 Your Purchase History</h1>
+    <a href="buyer.html" class="back-btn">← Back to Dashboard</a> 
+    
+    
+  </header>
+<br>
+  <button id="clearHistoryBtn" style="
+  background:#ef4444;
+  color:white;
+  border:none;
+  padding:10px 16px;
+  border-radius:8px;
+  cursor:pointer;
+  float:right;
+  margin-top:-50px;
+">
+  🧹 Clear History
+</button>
+  <div id="historyList" class="grid"></div>
+
+  <script>
+
+    document.getElementById("clearHistoryBtn").onclick = async () => {
+  const userEmail = localStorage.getItem("userEmail") || "buyer@test.com";
+
+  const ok = confirm("⚠️ Are you sure you want to permanently clear your purchase history?");
+  if (!ok) return;
+
+  const res = await fetch(
+    "http://localhost:5000/api/payment/history?email=" + encodeURIComponent(userEmail),
+    { method: "DELETE" }
+  );
+
+  const data = await res.json();
+  alert(data.msg || "History cleared");
+
+  // Refresh UI
+  loadHistory();
+};
+    async function loadHistory() {
+      try {
+        const userEmail = localStorage.getItem("userEmail") || "buyer@test.com";
+
+        const res = await fetch(
+          "http://localhost:5000/api/payment/history?email=" + encodeURIComponent(userEmail)
+        );
+
+        const list = await res.json();
+        const container = document.getElementById("historyList");
+        container.innerHTML = "";
+
+        if (!list.length) {
+          container.innerHTML = "<p class='empty'>No purchases yet.</p>";
+          return;
+        }
+
+        list.forEach(h => {
+          const div = document.createElement("div");
+          div.className = "card";
+
+          div.innerHTML = `
+            <div class="time">🕒 ${new Date(h.createdAt).toLocaleString()}</div>
+            <div class="row"><b>Units:</b> ${h.units} kWh</div>
+            <div class="row"><b>Rate:</b> ₹${h.rateAtPurchase} / unit</div>
+            <div class="row"><b>Platform Fee:</b> ₹${h.platformFeeAtPurchase}</div>
+            <div class="total">Total Paid: ₹${h.totalAmount}</div>
+          `;
+
+          container.appendChild(div);
+        });
+
+      } catch (e) {
+        console.error("Failed to load history", e);
+        document.getElementById("historyList").innerHTML =
+          "<p class='empty'>❌ Failed to load history. Is backend running?</p>";
+      }
+    }
+
+    loadHistory();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Owner</title>
+<style>
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:
+    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),
+    url("solar.jpg") no-repeat center/cover;
+}
+.card{
+  padding:30px;
+  background:#fff;
+}
+</style>
+</head>
+
+<body>
+<div class="card">
+<h2>Owner Dashboard</h2>
+<button onclick="logout()">Logout</button>
+</div>
+
+<script>
+function logout(){
+  localStorage.clear();
+  window.location.href="login.html";
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Watt-Wise | Smart Energy Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Razorpay -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",sans-serif}
+
+/* ===== HEADER ===== */
+header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:#0b0f14;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 50px;
+  flex-wrap: wrap; /* ✅ FIX: prevent overlap on small width */
+}
+
+.logo{
+  font-size:26px;
+  font-weight:800;
+  color:#4ade80;
+  white-space:nowrap;
+}
+
+nav ul{
+  list-style:none;
+  display:flex;
+  align-items:center;
+  gap:32px;
+  flex-wrap: wrap; /* ✅ FIX: prevent overlap */
+}
+
+nav li:hover .dropdown { 
+  display: block; 
+}
+
+nav a{
+  color:#fff;
+  text-decoration:none;
+  font-weight:500;
+  font-size:15px;
+}
+
+.notice-card{
+  background:rgba(255,255,255,0.08);
+  padding:14px;
+  border-radius:12px;
+}
+.notice-card a{color:#4ade80;text-decoration:none;}
+.notice-card small{opacity:.6;}
+
+
+/* ===== DROPDOWN ===== */
+.dropdown{
+  display:none;
+  position:absolute;
+  top:42px;
+  left:0;
+  right:auto;
+  background:#020617;
+  min-width:260px;
+  border-radius:8px;
+  box-shadow:0 10px 30px rgba(0,0,0,.6);
+  z-index:9999;
+}
+
+.dropdown a{
+  padding:12px 18px;
+  display:block;
+  font-size:14px;
+}
+
+.dropdown a:hover{background:#1f2937}
+nav li:hover .dropdown{display:block}
+
+/* ===== SYSTEM STATUS ===== */
+.system-status{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:14px;
+  color:#e5e7eb;
+}
+
+.status-dot{
+  width:10px;height:10px;
+  border-radius:50%;
+  background:#22c55e;
+  box-shadow:0 0 8px #22c55e;
+  animation:pulse 1.4s infinite;
+}
+
+@keyframes pulse{
+  0%{opacity:1}
+  50%{opacity:.4}
+  100%{opacity:1}
+}
+
+/* ===== TICKER ===== */
+.ticker-wrap{
+  background:#020617;
+  overflow:hidden;
+  border-top:1px solid #1f2937;
+  border-bottom:1px solid #1f2937;
+}
+
+.ticker{
+  display:inline-block;
+  white-space:nowrap;
+  padding-left:100%;
+  animation:scroll-left 25s linear infinite;
+}
+
+.ticker span{
+  display:inline-block;
+  margin-right:60px;
+  color:#a7f3d0;
+  font-size:14px;
+}
+
+@keyframes scroll-left{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(-100%)}
+}
+
+/* ===== HERO ===== */
+#hero{
+  height:90vh;
+  background:
+    linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.65)),
+    url("solar1.jpg") center/cover no-repeat;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  transition:background-image 1.2s ease-in-out;
+}
+
+.hero-box{
+  background:rgba(0,0,0,.65);
+  padding:40px 60px;
+  border-radius:16px;
+  text-align:center;
+}
+
+.hero-box h1{font-size:44px;color:#4ade80}
+.hero-box p{color:#e5e7eb;margin-top:6px}
+
+/* ===== SECTIONS ===== */
+section{padding:70px 50px}
+section:not(#hero){
+  background:
+    linear-gradient(rgba(0,0,0,.75),rgba(0,0,0,.75)),
+    url("solar.jpg") center/cover fixed;
+  color:#f9fafb;
+}
+
+h2{color:#4ade80;margin-bottom:20px;font-size:32px}
+
+/* ===== DASHBOARD ===== */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:25px;
+}
+
+.card{
+  background:rgba(15,15,15,.75);
+  padding:25px;
+  border-radius:18px;
+}
+
+.stat{font-size:32px;color:#4ade80;margin-top:10px}
+
+/* ===== BUY ===== */
+input,button{
+  padding:12px;
+  border-radius:8px;
+  border:none;
+  margin-top:10px;
+  font-size:15px;
+}
+
+button{
+  background:#4ade80;
+  font-weight:700;
+  cursor:pointer;
+}
+
+button:hover{background:#22c55e}
+
+
+
+
+
+
+
+
+/* ===== QR GENERATING EFFECT ===== */
+.qr-skeleton{
+  width:220px;height:220px;border-radius:10px;
+  background: linear-gradient(90deg, #1f2937 25%, #374151 37%, #1f2937 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.2s infinite linear;
+  margin: 10px auto;
+}
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+.qr-wrap{position:relative; display:inline-block}
+.qr-wrap img{transition: filter .6s ease, opacity .6s ease}
+.qr-progress{
+  height:4px;width:0%;
+  background:#4ade80;border-radius:4px;margin:6px auto 0;
+  transition: width 1.2s ease;
+}
+
+/* ===== FAQ ===== */
+.faq{
+  background:rgba(15,15,15,.75);
+  padding:20px;
+  border-radius:16px;
+  margin-bottom:15px;
+  cursor:pointer;
+}
+
+.faq h3{color:#4ade80}
+.faq p{display:none;margin-top:10px}
+.faq.active p{display:block}
+
+/* ===== FOOTER ===== */
+footer{
+  background:
+    linear-gradient(rgba(247, 160, 245, 0.85),rgba(171, 69, 194, 0.85)),
+    url("solar.jpg") center/cover;
+  text-align:center;
+  padding:30px;
+}
+
+footer a{color:#0f0bea;text-decoration:none}
+.copy{margin-top:20px;}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<div id="noticePanel" style="
+  display:none;
+  position:fixed;
+  top:80px;
+  right:20px;
+  width:380px;
+  max-height:80vh;
+  overflow-y:auto;
+  background:rgba(227, 221, 221, 0.9);
+  padding:20px;
+  border-radius:16px;
+  z-index:9999;
+  box-shadow:0 10px 30px rgba(237, 233, 233, 0.6);
+">
+  <h2 style="color:#5f24f3;margin-bottom:12px;">📢 Notices & Updates</h2>
+  <div id="noticesList" style="display:grid;gap:12px;"></div>
+</div>
+
+
+
+  <div style="display:flex;align-items:center;gap:20px;">
+    <div class="logo">⚡ Watt-Wise</div>
+    <div class="system-status">
+      <div class="status-dot"></div>
+      <span id="systemText">System Online</span>
+    </div>
+  </div>
+
+  <nav>
+    <ul>
+       <li><a href="Login.html">Login</a></li>
+
+      <li>
+        <a href="#">About Department ▾</a>
+        <div class="dropdown">
+          <a href="intro.html">Introduction</a>
+          <a href="vision.html">Vision & Mission</a>
+          <a href="objective.html">Objectives & Functions</a>
+          <a href="who.html">Who’s Who</a>
+        </div>
+      </li>
+      <!-- <li>
+  <a href="notice.html">
+    Notices & Updates (<span id="noticeCount">0</span>)
+  </a>
+</li> -->
+<!-- <section id="notices">
+  <h2>📢 Notices & Updates</h2>
+  <div id="noticesList" class="grid"></div>
+</section> -->
+
+<li style="position:relative;">
+  <a href="javascript:void(0)" onclick="toggleNotices()">
+    Notices & Updates
+    <span id="noticeBadge" style="
+      display:none;
+      background:red;
+      color:white;
+      border-radius:50%;
+      padding:2px 6px;
+      font-size:12px;
+      position:absolute;
+      top:-6px;
+      right:-14px;
+    ">1</span>
+  </a>
+</li>
+
+
+      <li><a href="#faq">FAQs</a></li>
+      <li><a href="history.html" target="_blank" class="btn-history">
+  📄 View Purchase History
+</a></li>
+    </ul>
+  </nav>
+</header>
+
+<div class="ticker-wrap">
+  <div class="ticker" id="tickerText">
+    <span>Solar generation active during daylight hours.</span>
+    <span>Night-time energy supported via storage & grid balancing.</span>
+    <span>Razorpay payment gateway operational.</span>
+    <span>EV charging supported using local solar energy.</span>
+    <span>Smart meters updating in real time.</span>
+  </div>
+</div>
+
+<section id="hero">
+  <div class="hero-box">
+    <h1>Hyper-Local Solar Energy Trading</h1>
+    <p id="datetime"></p>
+    <p id="status"></p>
+  </div>
+</section>
+
+<section id="dashboard">
+<h2>Live Energy Dashboard</h2>
+<div class="grid">
+  <div class="card">Total Energy<div class="stat" id="energy">520 kWh</div></div>
+  <div class="card">Active Buyers<div class="stat" id="buyers">148</div></div>
+  <div class="card">Location<div class="stat">AIT Pune</div></div>
+  <div class="card">System Status<div class="stat" id="dayStatus"></div></div>
+
+</section>
+
+<section id="buy">
+<h2>Buy Clean Energy</h2>
+<div class="card">
+Units (kWh):
+<input type="number" id="units" min="1" value="1" oninput="calculateAmount()">
+<p style="margin-top:10px;font-size:18px">
+Amount to Pay: <b>₹ <span id="amount">0</span></b>
+</p>
+<button id="payBtn" onclick="payWithRazorpay()">Scan QR to Pay</button>
+<small style="opacity:.7;display:block;margin-top:6px;">
+  You’ll be shown a QR to scan with any UPI app
+</small>
+
+
+</div>
+</section>
+
+
+<!-- ================== HISTORY SECTION ==================
+<section id="history">
+  <h2>🧾 Your Purchase History</h2>
+  <div id="historyList" class="grid"></div>
+</section> -->
+
+
+<!-- ================== AI ADVISOR ================== -->
+<section id="ai">
+  <h2>🤖 Smart Energy Advisor</h2>
+  <div class="card">
+    <p>Ask AI how to save money on energy</p>
+    <button onclick="askAI()">Get Advice</button>
+    <div id="aiResponse" style="margin-top:12px;opacity:.9;"></div>
+  </div>
+</section>
+
+
+
+
+
+<section id="faq">
+  <h2>Frequently Asked Questions (FAQs)</h2>
+
+  <div class="faq">
+    <h3>1. What is Watt-Wise and how does it work?</h3>
+    <p>
+      Watt-Wise is a hyper-local solar energy trading platform that enables users
+      to buy and sell excess solar power within a community using real-time data,
+      smart analytics, and secure digital payments.
+    </p>
+  </div>
+
+  <div class="faq">
+    <h3>2. How is the price of electricity calculated?</h3>
+    <p>
+      Electricity is priced per kilowatt-hour (kWh) based on a base rate
+      (₹8 per unit) while considering availability, demand, and system conditions.
+      This ensures fair and transparent pricing.
+    </p>
+  </div>
+
+  <div class="faq">
+    <h3>3. Can I purchase electricity at night?</h3>
+    <p>
+      Yes. During night hours, energy is supplied using stored solar power
+      and grid-balanced electricity to ensure uninterrupted service.
+    </p>
+  </div>
+
+  <div class="faq">
+    <h3>4. How does Watt-Wise help reduce energy wastage?</h3>
+    <p>
+      Excess solar energy that would otherwise be unused is redistributed
+      locally to nearby consumers, reducing transmission losses and wastage.
+    </p>
+  </div>
+
+  <div class="faq">
+    <h3>5. Is the payment process secure?</h3>
+    <p>
+      All payments are processed through Razorpay, which follows bank-grade
+      encryption standards and secure transaction protocols.
+    </p>
+  </div>
+
+  <div class="faq">
+    <h3>6. Can users track their energy usage and payments?</h3>
+    <p>
+      Yes. Watt-Wise provides real-time dashboards that show energy consumption,
+      total units purchased, transaction history, and payment summaries.
+    </p>
+  </div>
+
+  <div class="faq">
+    <h3>7. Who can sell electricity on Watt-Wise?</h3>
+    <p>
+      Registered users with rooftop solar installations or renewable energy
+      sources can sell surplus electricity to nearby buyers on the platform.
+    </p>
+  </div>
+
+  <div class="faq">
+    <h3>8. How does artificial intelligence improve the system?</h3>
+    <p>
+      AI models are used to forecast energy generation and demand, optimize
+      pricing, and balance loads to maintain grid stability.
+    </p>
+  </div>
+
+  <div class="faq">
+    <h3>9. How does Watt-Wise support smart city initiatives?</h3>
+    <p>
+      The platform promotes decentralized energy distribution, reduces carbon
+      emissions, supports EV charging, and aligns with smart-city sustainability
+      goals.
+    </p>
+  </div>
+
+  <div class="faq">
+    <h3>10. What future features are planned?</h3>
+    <p>
+      Future enhancements include battery storage integration, mobile
+      applications, blockchain-based billing, and carbon credit tracking.
+    </p>
+  </div>
+</section>
+
+
+<footer>
+<a href="https://mail.google.com/mail/?view=cm&fs=1&to=ramgrewal313@gmail.com" target="_blank">
+  📧 ramgrewal313@gmail.com
+</a>
+ |
+📷 <a href="https://instagram.com/vinitkumar._.1418" target="_blank">@vinitkumar._.1418</a> |
+📞 92092-56893
+<div class="copy">© 2026 Watt-Wise · Clean Energy · Smart Cities</div>
+</footer>
+
+<script>
+let lastSeenNoticeTime = localStorage.getItem("lastSeenNoticeTime");
+
+// Fetch notices and show badge if new notice exists
+async function checkNewNotices() {
+  try {
+    const res = await fetch("http://localhost:5000/api/user/notices");
+    const notices = await res.json();
+
+    if (!notices.length) return;
+
+    const latest = new Date(notices[0].createdAt).getTime();
+    const lastSeen = lastSeenNoticeTime ? Number(lastSeenNoticeTime) : 0;
+
+    if (latest > lastSeen) {
+      document.getElementById("noticeBadge").style.display = "inline-block";
+    }
+  } catch (e) {
+    console.log("Notice check failed");
+  }
+}
+
+//check new notices
+async function updateNoticeBadge() {
+  try {
+    const res = await fetch("http://localhost:5000/api/user/notices", { cache: "no-store" });
+    const notices = await res.json();
+
+    if (!Array.isArray(notices) || notices.length === 0) return;
+
+    const latestTime = new Date(notices[0].createdAt).getTime();
+    const lastSeen = Number(localStorage.getItem("lastSeenNoticeTime") || 0);
+
+    if (latestTime > lastSeen) {
+      const badge = document.getElementById("noticeBadge");
+      badge.innerText = "1";           // or notices.length if you want count
+      badge.style.display = "inline-block";
+    }
+  } catch (e) {
+    console.log("Badge update failed");
+  }
+}
+
+// Toggle notice panel when clicking navbar
+async function toggleNotices() {
+  const panel = document.getElementById("noticePanel");
+
+  if (panel.style.display === "none") {
+    panel.style.display = "block";
+    await loadNotices();
+
+    // mark as seen
+    const res = await fetch("http://localhost:5000/api/user/notices");
+    const notices = await res.json();
+    if (notices.length) {
+      localStorage.setItem("lastSeenNoticeTime", new Date(notices[0].createdAt).getTime());
+    }
+
+    document.getElementById("noticeBadge").style.display = "none";
+  } else {
+    panel.style.display = "none";
+  }
+}
+
+/* ===== FETCH NOTICES FROM BACKEND ===== */
+async function loadNotices() {
+  try {
+    const res = await fetch("http://localhost:5000/api/user/notices");
+    const notices = await res.json();
+
+    const container = document.getElementById("noticesList");
+    container.innerHTML = "";
+
+    if (!notices.length) {
+      container.innerHTML = "<p>No notices yet.</p>";
+      return;
+    }
+
+    notices.forEach(n => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `
+        <h3>${n.title}</h3>
+        <p>${n.message}</p>
+        ${n.pdf ? `<a href="http://localhost:5000/uploads/${n.pdf}" target="_blank">📄 Download PDF</a>` : ""}
+        <small style="opacity:.7;display:block;margin-top:6px;">
+          ${new Date(n.createdAt).toLocaleString()}
+        </small>
+      `;
+      container.appendChild(div);
+    });
+  } catch (err) {
+    console.error("Failed to load notices", err);
+  }
+}
+
+loadNotices();
+
+/* HERO IMAGE ROTATION */
+const heroImages=["solar1.jpg","solar2.jpg","solar3.jpg","solar4.jpg"];
+let idx=0;
+setInterval(()=>{
+  idx=(idx+1)%heroImages.length;
+  document.getElementById("hero").style.backgroundImage=
+  `linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.65)),url('${heroImages[idx]}')`;
+},5000);
+
+/* TIME */
+function updateTime(){
+  const d=new Date(),h=d.getHours();
+  let s="Night 🌙";
+  if(h>=5&&h<12)s="Day ☀️";
+  else if(h>=12&&h<17)s="Afternoon 🌤️";
+  else if(h>=17&&h<20)s="Evening 🌆";
+  document.getElementById("datetime").innerText=d.toDateString()+" | "+d.toLocaleTimeString();
+  document.getElementById("status").innerText=s;
+  
+}
+setInterval(updateTime,1000);updateTime();
+
+/* LIVE DATA */
+let energy=520,buyers=148;
+setInterval(()=>{
+  energy+=Math.floor(Math.random()*3);
+  buyers+=Math.floor(Math.random()*5-2);
+  document.getElementById("energy").innerText=energy+" kWh";
+  document.getElementById("buyers").innerText=buyers;
+},5000);
+// this is system status
+async function checkServerStatus() {
+  const dot = document.querySelector(".status-dot");
+  const text = document.getElementById("systemText");
+  const card = document.getElementById("dayStatus"); // ✅ right-most System card
+
+  try {
+    const res = await fetch("http://localhost:5000/api/health", { cache: "no-store" });
+    if (!res.ok) throw new Error("Server not OK");
+
+    dot.style.background = "#22c55e";
+    dot.style.boxShadow = "0 0 8px #22c55e";
+    text.innerText = "System Online";
+
+    if (card) {
+      card.innerText = "Online 🟢";
+      card.style.color = "#22c55e";
+    }
+  } catch (e) {
+    dot.style.background = "#ef4444";
+    dot.style.boxShadow = "0 0 8px #ef4444";
+    text.innerText = "System Maintenance";
+
+    if (card) {
+      card.innerText = "Maintenance 🔴";
+      card.style.color = "#ef4444";
+    }
+  }
+}
+
+
+/* SYSTEM STATUS (REAL SERVER CHECK) */
+checkServerStatus();              // check immediately on page load
+setInterval(checkServerStatus, 10000);  // check every 10 seconds
+
+
+
+/* PAYMENT */
+/* ===== LIVE ELECTRICITY RATE & PAYMENT ===== */
+let currentRate = 0;
+let platformFee = 0;
+
+async function loadRate() {
+  try {
+    const res = await fetch("http://localhost:5000/api/rate");
+    const data = await res.json();
+    currentRate = Number(data.rate) || 0;
+    calculateAmount();
+  } catch (e) {
+    console.error("Failed to load rate");
+  }
+}
+
+async function loadPlatformFee() {
+  try {
+    const res = await fetch("http://localhost:5000/api/platform-fee");
+    const data = await res.json();
+    platformFee = Number(data.fee) || 0;
+    calculateAmount();
+  } catch (e) {
+    console.error("Failed to load platform fee");
+  }
+}
+
+function calculateAmount() {
+  const units = Number(document.getElementById("units").value || 0);
+  const amount = units * currentRate + platformFee;
+  document.getElementById("amount").innerText = amount;
+}
+
+loadRate();
+loadPlatformFee();
+setInterval(loadRate, 5000);
+
+function payWithRazorpay() {
+  const btn = document.getElementById("payBtn");   // ✅ ADDED
+  if (btn) { btn.disabled = true; btn.innerText = "Opening QR…"; } // ✅ ADDED
+  const u = Number(document.getElementById("units").value);
+  if (u <= 0) { alert("Enter valid units"); return; }
+
+  const amount = u * currentRate + platformFee;
+
+  const modal = document.createElement("div");
+  modal.style = `
+    position:fixed; inset:0; background:rgba(0,0,0,0.7);
+    display:flex; align-items:center; justify-content:center; z-index:99999;
+  `;
+
+  modal.innerHTML = `
+  <div style="background:#0b1220;padding:20px;border-radius:12px;text-align:center;color:#fff;max-width:340px;">
+    <h3>Scan to Pay ₹${amount}</h3>
+   <div class="qr-wrap">
+  <div id="qrSkeleton" class="qr-skeleton"></div>
+  <img id="upiQrImg" src="upi-qr.png" alt="UPI QR"
+       style="width:220px;margin:10px 0;border-radius:8px;opacity:0;filter:blur(8px);" />
+</div>
+<p id="qrStatus" style="font-size:13px;opacity:.7;">Generating QR…</p>
+<div id="qrProgress" class="qr-progress"></div>
+    <p>Scan this QR in any UPI app</p>
+
+    <p style="font-size:14px;opacity:.9;">
+      Or pay manually to UPI ID:
+      <br><b id="upiIdText">yourupi@okicici</b>
+    </p>
+
+    <p id="qrTimer" style="margin-top:8px;font-size:13px;opacity:.7;">
+      This QR will close in 120 seconds
+    </p>
+
+    <button id="paidBtn" style="margin:6px;padding:10px 14px;">I Have Paid</button>
+    <button id="cancelBtn" style="margin:6px;padding:10px 14px;background:#ef4444;color:#fff;">Cancel</button>
+  </div>
+`;
+
+
+  document.body.appendChild(modal);
+// ===== QR "Generating" animation =====
+const qrImg = document.getElementById("upiQrImg");
+const qrSkeleton = document.getElementById("qrSkeleton");
+const qrStatus = document.getElementById("qrStatus");
+const qrProgress = document.getElementById("qrProgress");
+
+setTimeout(() => { qrProgress.style.width = "100%"; }, 50);
+
+setTimeout(() => {
+  if (qrSkeleton) qrSkeleton.style.display = "none";
+  if (qrImg) {
+    qrImg.style.opacity = "1";
+    qrImg.style.filter = "none";
+  }
+  if (qrStatus) qrStatus.innerText = "Scan QR in any UPI app";
+}, 1200);
+  
+
+  // ⏱️ Auto-close QR after 2 minutes (120 seconds)
+let timeLeft = 120;
+const timerEl = document.getElementById("qrTimer");
+
+const qrInterval = setInterval(() => {
+  timeLeft--;
+  if (timerEl) timerEl.innerText = `This QR will close in ${timeLeft} seconds`;
+
+  if (timeLeft <= 0) {
+    clearInterval(qrInterval);
+    if (document.body.contains(modal)) {
+      document.body.removeChild(modal);
+      if (btn) { btn.disabled = false; btn.innerText = "Scan QR to Pay"; }
+      alert("⏱️ QR expired. Please try again.");
+    }
+  }
+}, 1000);
+
+
+ document.getElementById("cancelBtn").onclick = () => {
+  clearInterval(qrInterval);
+  document.body.removeChild(modal);
+  if (btn) { btn.disabled = false; btn.innerText = "Scan QR to Pay"; }
+  alert("❌ Payment cancelled. Amount not deducted.");
+};
+
+
+ document.getElementById("paidBtn").onclick = async () => {
+  clearInterval(qrInterval);
+  document.body.removeChild(modal);
+  if (btn) { btn.disabled = false; btn.innerText = "Scan QR to Pay"; }
+
+  const userEmail = localStorage.getItem("userEmail") || "buyer@test.com";
+  const name = localStorage.getItem("name") || "Buyer";
+  const userId = localStorage.getItem("userId") || "demo-user";
+
+ await fetch("http://localhost:5000/api/payment/request", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    userId,
+    name,
+    userEmail,
+    amount,
+    units: u,                  // ✅
+    rate: currentRate,         // ✅
+    platformFee: platformFee,  // ✅
+    utr: "UPI-" + Date.now()
+  })
+});
+
+  alert("⏳ Payment sent for admin verification.\nYou’ll be notified once approved.");
+};
+    // alert("✅ Payment Successful");
+
+    const userEmail = localStorage.getItem("userEmail") || "buyer@test.com";
+
+  //   await fetch("http://localhost:5000/api/payment/success", {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({
+  //       userEmail,
+  //       units: u,
+  //       rate: currentRate,
+  //       platformFee: platformFee,
+  //       totalAmount: amount,
+  //       razorpayPaymentId: "UPI-DEMO-" + Date.now()
+  //     })
+  //   });
+
+  //   await loadHistory();
+  //   document.getElementById("history").scrollIntoView({ behavior: "smooth" });
+  // };
+ }
+
+/* ===== HISTORY LOGIC ===== */
+async function loadHistory() {
+  try {
+    const userEmail = localStorage.getItem("userEmail") || "buyer@test.com";
+    const res = await fetch("http://localhost:5000/api/payment/history?email=" + encodeURIComponent(userEmail));
+    const list = await res.json();
+
+    const container = document.getElementById("historyList");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    if (!list.length) {
+      container.innerHTML = "<p>No purchases yet.</p>";
+      return;
+    }
+
+    list.forEach(h => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `
+        <h3>🕒 ${new Date(h.createdAt).toLocaleString()}</h3>
+        <p>Units: <b>${h.units} kWh</b></p>
+        <p>Rate: ₹${h.rateAtPurchase} / unit</p>
+        <p>Platform Fee: ₹${h.platformFeeAtPurchase}</p>
+        <p><b>Total Paid: ₹${h.totalAmount}</b></p>
+      `;
+      container.appendChild(div);
+    });
+  } catch (e) {
+    console.error("Failed to load history", e);
+  }
+}
+
+loadHistory();
+
+/* FAQ */
+document.querySelectorAll(".faq").forEach(f=>f.onclick=()=>f.classList.toggle("active"));
+
+async function askAI() {
+  const userEmail = localStorage.getItem("userEmail") || "buyer@test.com";
+  const out = document.getElementById("aiResponse");
+  out.innerText = "🤔 Thinking...";
+
+  try {
+    const res = await fetch("http://localhost:5000/api/ai/advice", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userEmail })
+    });
+
+    const data = await res.json();
+    out.innerText = "💡 " + (data.advice || "No advice available right now.");
+  } catch (e) {
+    out.innerText = "❌ AI is unavailable right now.";
+  }
+}
+
+updateNoticeBadge();                 // check once on load
+setInterval(updateNoticeBadge, 10000); // check every 10 seconds
+
+
+</script>
+
+
+</body>
+</html>
+
+<!-- 
+imp imp IMP
+//buyer.html ka place pa index.html name dalo to click on localhost -->

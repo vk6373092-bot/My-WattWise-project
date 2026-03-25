@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Register</title>
+<style>
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:
+    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),
+    url("solar.jpg") no-repeat center/cover;
+  font-family: Arial, sans-serif;
+}
+.card{
+  width:340px;
+  padding:30px;
+  background:#fff;
+  border-radius:8px;
+}
+input,button{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+}
+button{
+  background:#2c5364;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+<div class="card">
+  <h3>Register</h3>
+
+  <input id="name" placeholder="Name">
+  <input id="email" placeholder="Email">
+  <input id="place" placeholder="Place">
+  <input id="password" type="password" placeholder="Password">
+  <input id="confirmPassword" type="password" placeholder="Confirm Password">
+
+  <button type="button" onclick="register()">Register</button>
+
+  <p id="msg" style="color:green"></p>
+  <p id="err" style="color:red"></p>
+</div>
+
+<script>
+async function register() {
+  const msg = document.getElementById("msg");
+  const err = document.getElementById("err");
+
+  msg.innerText = "";
+  err.innerText = "";
+
+  const nameVal = document.getElementById("name").value.trim();
+  const emailVal = document.getElementById("email").value.trim();
+  const placeVal = document.getElementById("place").value.trim();
+  const passVal = document.getElementById("password").value;
+  const confirmVal = document.getElementById("confirmPassword").value;
+
+  if (!nameVal || !emailVal || !placeVal || !passVal || !confirmVal) {
+    err.innerText = "❌ All fields are required";
+    return;
+  }
+
+  if (!passVal.includes("@") && !passVal.includes("#")) {
+    err.innerText = "❌ Password must contain @ or #";
+    return;
+  }
+  if (passVal.length < 6) {
+  err.innerText = "❌ Password must be at least 6 characters";
+  return;
+}
+
+
+  if (passVal !== confirmVal) {
+    err.innerText = "❌ Passwords do not match";
+    return;
+  }
+
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: nameVal,
+        email: emailVal,
+        place: placeVal,
+        password: passVal
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      err.innerText = data.msg || "Registration failed";
+      return;
+    }
+
+    msg.innerText = "✅ Registered successfully!";
+    setTimeout(() => window.location.href = "login.html", 1500);
+
+  } catch (e) {
+    console.error(e);
+    err.innerText = "❌ Backend not reachable";
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Forgot Password</title>
+<style>
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:
+    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),
+    url("solar.jpg") no-repeat center/cover;
+}
+.card{
+  width:320px;
+  padding:30px;
+  background:#fff;
+}
+input,button{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+}
+button{
+  background:#2c5364;
+  color:white;
+  border:none;
+}
+</style>
+</head>
+
+<body>
+<div class="card">
+<h3>Forgot Password</h3>
+
+<input id="email" placeholder="Enter Email">
+<button onclick="go()">Continue</button>
+
+<p id="err" style="color:red"></p>
+</div>
+
+<script>
+function go(){
+  if(!email.value){
+    err.innerText="Email required";
+    return;
+  }
+  sessionStorage.setItem("resetEmail", email.value);
+  window.location.href="reset.html";
+}
+</script>
+</body>
+</html>

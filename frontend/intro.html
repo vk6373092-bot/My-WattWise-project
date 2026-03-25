@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intro - WattWise</title>
+
+  <style>
+    /* ===== FULL PAGE INTRODUCTION ===== */
+    #intro {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      background:
+        linear-gradient(rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.78)),
+        url("./solar.jpg") center / cover no-repeat fixed;
+      padding: 40px 15px;
+    }
+
+    #intro .intro-wrapper {
+      max-width: 1000px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      padding: 35px 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    #intro h2 {
+      font-size: 42px;
+      margin-bottom: 25px;
+      color: #4ade80;
+      text-align: center;
+    }
+
+    #intro p {
+      font-size: 18px;
+      line-height: 1.75;
+      margin-bottom: 18px;
+      color: #d9dce7;
+      text-align: justify;
+    }
+
+    #intro .highlight {
+      color: #a7f3d0;
+      font-weight: 600;
+    }
+
+    /* ===== VIDEO SECTION ===== */
+    .video-section {
+      margin-top: 35px;
+      text-align: center;
+    }
+
+    .video-section h3 {
+      color: #4ade80;
+      margin-bottom: 15px;
+      font-size: 26px;
+    }
+
+    .video-box {
+      max-width: 360px;
+      margin: auto;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    }
+
+    video {
+      width: 100%;
+      display: block;
+      border-radius: 12px;
+      background: #000;
+    }
+  </style>
+</head>
+
+<body>
+  <section id="intro">
+    <div class="intro-wrapper">
+
+  <h2>Introduction</h2>
+
+  <p>
+    <span class="highlight">Watt-Wise</span> is a next-generation smart energy
+    management and hyper-local solar energy trading platform designed to
+    transform the way electricity is generated, distributed, and consumed
+    in modern smart cities.
+  </p>
+
+  <p>
+    With the rapid growth of renewable energy sources, especially rooftop solar
+    installations, a significant portion of generated solar energy remains
+    underutilized or wasted due to lack of real-time coordination between
+    producers and consumers. Watt-Wise directly addresses this challenge by
+    enabling <span class="highlight">peer-to-peer energy exchange</span> within
+    a localized community.
+  </p>
+
+  <!-- 🔥 VIDEO IN THE MIDDLE -->
+  <div class="video-section">
+    <h3>Quick Project Overview</h3>
+    <div class="video-box">
+      <video controls>
+        <source src="wattwise.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+
+  <p>
+    The platform allows households, educational institutions, commercial
+    buildings, and electric vehicle charging stations to seamlessly
+    <span class="highlight">buy and sell excess solar energy</span> based on
+    real-time availability, demand, and pricing signals.
+  </p>
+
+  <p>
+    Watt-Wise integrates intelligent monitoring through smart meters,
+    AI-driven analytics, and automated pricing models to ensure optimal
+    energy utilization while maintaining grid stability. Users can track
+    live energy generation, consumption, revenue, and savings through an
+    interactive dashboard.
+  </p>
+
+  <p>
+    By promoting localized energy sharing, Watt-Wise significantly reduces
+    transmission losses, lowers carbon emissions, and decreases dependency
+    on centralized power grids. This approach supports national sustainability
+    goals and aligns with the vision of
+    <span class="highlight">clean energy, energy independence, and resilient smart infrastructure</span>.
+  </p>
+
+  <p>
+    In essence, Watt-Wise is not just a technology solution—it is a step toward
+    empowering communities, enabling responsible energy consumption, and
+    building a sustainable energy ecosystem for the future.
+  </p>
+
+</div>
+  </section>
+</body>
+</html>

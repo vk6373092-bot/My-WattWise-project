@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login</title>
+  <style>
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background:
+        linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
+        url("solar.jpg") no-repeat center/cover;
+      font-family: Arial, sans-serif;
+    }
+
+    .card {
+      width: 320px;
+      padding: 30px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    h3 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      background: #2c5364;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .google-btn {
+  background: #f8f4f4;
+  color: #444;
+  border: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.google-btn:hover {
+  background: #f7f7f7;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transform: translateY(-1px);
+}
+
+
+    .google-btn img {
+      width: 18px;
+    }
+
+    a {
+      display: block;
+      margin-top: 10px;
+      text-align: center;
+      text-decoration: none;
+      color: #2c5364;
+    }
+
+    #err {
+      margin-top: 10px;
+      color: red;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h3>Login</h3>
+
+    <input id="email" type="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Password" />
+
+    <button type="button" onclick="login()">Login</button>
+
+   <button type="button" class="google-btn" onclick="googleLogin()">
+  <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" />
+  Continue with Google
+</button>
+
+
+    <a href="forgot.html">Forgot Password?</a>
+    <a href="register.html">New Registration</a>
+
+    <p id="err"></p>
+  </div>
+
+ <script>
+async function login() {
+  const err = document.getElementById("err");
+  err.innerText = "";
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!email || !password) {
+    err.innerText = "❌ All fields required";
+    return;
+  }
+
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      err.innerText = data.msg || "Login failed";
+      return;
+    }
+
+    // 🔁 Redirect based on role
+    if (data.role === "admin") {
+      window.location.href = "admin-panel.html";   // 👈 YOUR ADMIN PAGE
+    } else {
+      window.location.href = "buyer.html";
+    }
+
+  } catch (e) {
+    console.error(e);
+    err.innerText = "❌ Backend not reachable";
+  }
+}
+
+function googleLogin() {
+  window.location.href = "http://localhost:5000/auth/google";
+}
+</script>
+
+</body>
+</html>

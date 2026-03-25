@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Reset Password</title>
+<style>
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:
+    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),
+    url("solar.jpg") no-repeat center/cover;
+}
+.card{
+  width:320px;
+  padding:30px;
+  background:#fff;
+}
+input,button{width:100%;padding:10px;margin-top:10px;}
+button{background:#2c5364;color:white;border:none;}
+.msg{color:green;}
+</style>
+</head>
+
+<body>
+<div class="card">
+<h3>Create New Password</h3>
+<input id="p1" type="password" placeholder="New Password">
+<input id="p2" type="password" placeholder="Confirm Password">
+<button onclick="reset()">Submit</button>
+<p id="msg" class="msg"></p>
+<p id="err" style="color:red"></p>
+</div>
+
+<script>
+function reset(){
+  if(!p1.value || !p2.value){
+    err.innerText="All fields required";
+    return;
+  }
+  if(p1.value!==p2.value){
+    err.innerText="Passwords do not match";
+    return;
+  }
+  msg.innerText="✅ Password successfully updated!";
+  setTimeout(()=>window.location.href="login.html",1500);
+}
+</script>
+</body>
+</html>
